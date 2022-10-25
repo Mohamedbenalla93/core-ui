@@ -1,0 +1,191 @@
+<div class="card">
+  <div class="card-header py-4">
+    <h3 className="card-title align-items-start flex-column">
+      <span className="card-label fw-bolder fs-3 mb-1">Books list</span>
+      <button
+        class="btn btn-lg btn-outline-danger btn-lg me-2"
+        (click)="deleteSelectedBooks()"
+        style="float: right"
+      >
+        <span *ngIf="isLoading">
+          <fa-icon [icon]="faCircleNotch" [spin]="true"></fa-icon>
+        </span>
+        <span *ngIf="!isLoading">
+          <fa-icon [icon]="faRemove"></fa-icon> Delete
+        </span>
+      </button>
+      <a
+        [routerLink]="['/book/create']"
+        class="btn btn-outline-info btn-lg me-2"
+        style="float: right"
+      >
+        <fa-icon [icon]="plusIcon"></fa-icon> Create Book
+      </a>
+      <button
+        [cModalToggle]="verticallyCenteredModal.id"
+        class="btn btn-lg btn-outline-success me-2"
+        style="float: right"
+      >
+        <fa-icon [icon]="faSearch"></fa-icon> Search
+      </button>
+    </h3>
+  </div>
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              (change)="checkAllBooks($event)"
+            />
+          </th>
+          <th scope="col">Title</th>
+          <th scope="col">Author</th>
+          <th scope="col">Published At</th>
+          <th scope="col">Genres</th>
+          <th scope="col">Pages count</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody
+        infinite-scroll
+        [infiniteScrollDistance]="2"
+        [infiniteScrollThrottle]="1000"
+        (scrolled)="onScroll()"
+      >
+        <tr *ngIf="totalCount == 0">
+          <td colspan="6">No data Found</td>
+        </tr>
+        <tr *ngFor="let book of books">
+          <th scope="row">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [(ngModel)]="book.checked"
+              name="checked"
+              (click)="toggleCheckBook(book.id)"
+            />
+          </th>
+          <th scope="row">{{ book.title }}</th>
+          <td>
+            {{ book.author.firstName + " " + book.author.lastName }}
+          </td>
+          <td>{{ book.publishedAtFormted }}</td>
+          <td>{{ book.genres }}</td>
+          <td>{{ book.numberOfPages }}</td>
+          <td>
+            <a [routerLink]="['/book/' + book.id]" class="btn btn-icon">
+              <fa-icon [icon]="faEdit"></fa-icon>
+            </a>
+            <button class="btn btn-icon" (click)="deleteBook(book.id)">
+              <fa-icon [icon]="faRemove"></fa-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #popoverHtml>
+      <h3 class="popover-header"></h3>
+      <div class="popover-body"></div>
+    </ng-template>
+  </div>
+</div>
+<c-modal
+  #verticallyCenteredModal
+  alignment="center"
+  id="verticallyCenteredModal"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Find specific books.</h5>
+    <button [cModalToggle]="verticallyCenteredModal.id" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form>
+      <div class="row">
+        <div class="col-12">
+          <div [cFormFloating]="true" class="mb-3">
+            <input
+              cFormControl
+              id="title"
+              placeholder="Find by title"
+              type="text"
+              name="title"
+              [(ngModel)]="filter.title"
+            />
+            <label cLabel for="title">Title</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div [cFormFloating]="true" class="mb-3">
+            <input
+              cFormControl
+              id="authorFirstname"
+              placeholder="Find by Author firstname"
+              type="text"
+              name="authorFirstname"
+              [(ngModel)]="filter.authorFirstname"
+            />
+            <label cLabel for="authorFirstname">Author firstname</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div [cFormFloating]="true" class="mb-3">
+            <input
+              cFormControl
+              id="authorLastname"
+              placeholder="Find by Author author lastname"
+              type="text"
+              name="authorLastname"
+              [(ngModel)]="filter.authorLastname"
+            />
+            <label cLabel for="authorLastname">Author lastname</label>
+          </div>
+        </div>
+        <div class="col">
+          <div [cFormFloating]="true" class="mb-3">
+            <input
+              cFormControl
+              id="publishedAtFrom"
+              type="date"
+              name="publishedAtFrom"
+              [(ngModel)]="filter.publishedAtFrom"
+            />
+            <label cLabel for="publishedAtFrom">Date published from:</label>
+          </div>
+        </div>
+        <div class="col">
+          <div [cFormFloating]="true" class="mb-3">
+            <input
+              cFormControl
+              id="publishedAtTo"
+              type="date"
+              name="publishedAtTo"
+              [(ngModel)]="filter.publishedAtTo"
+            />
+            <label cLabel for="publishedAtTo">Date published to:</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      [cModalToggle]="verticallyCenteredModal.id"
+      cButton
+      color="secondary"
+    >
+      Close
+    </button>
+    <button
+      (click)="search()"
+      class="btn btn-outline-info"
+      [cModalToggle]="verticallyCenteredModal.id"
+    >
+      <fa-icon [icon]="faSearch"></fa-icon>
+      Seacrh
+    </button>
+  </c-modal-footer>
+</c-modal>

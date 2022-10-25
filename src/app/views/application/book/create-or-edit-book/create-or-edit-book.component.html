@@ -1,0 +1,207 @@
+<div class="card">
+  <div class="card-header">
+    <strong>Add Book</strong>
+  </div>
+
+  <div class="card-body">
+    <form   #bookForm = "ngForm"(ngSubmit)="onSubmit(bookForm)">
+      <div class="row">
+        <div class="col-md-6">
+          <label cLabel for="exampleFormControlInput1">Book title :</label>
+          <input
+            cFormControl
+            id="title"
+            name="title"
+            [(ngModel)]="book.title"
+            #title="ngModel"
+            [required]="true"
+            [maxlength]="titleMaxLength"
+            placeholder="title of the book"
+            type="text"
+            [valid]="title.dirty || title.touched ? !title.invalid : undefined"
+          />
+          <div *ngIf="title.invalid && (title.dirty || title.touched)">
+            <div
+              *ngIf="title.errors?.['required']"
+              class="invalid-feedback show-error-validation"
+            >
+              please provide a title*
+            </div>
+            <div
+              *ngIf="title.errors?.['maxlength']"
+              class="invalid-feedback show-error-validation"
+            >
+              the title length cannot exceed {{ titleMaxLength }} caracters.
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label cLabel for="exampleFormControlInput1">Author :</label>
+          <select
+            cSelect
+            id="authorId"
+            name="authorId"
+            [(ngModel)]="book.authorId"
+            #authorId="ngModel"
+            required="true"
+            [valid]="
+              authorId.dirty || authorId.touched ? !authorId.invalid : undefined
+            "
+          >
+            <option value="">Select the author</option>
+            <option *ngFor="let author of authors" value="{{ author.id }}">
+              {{ author.firstName + " " + author.lastName }}
+            </option>
+          </select>
+          <div *ngIf="authorId.invalid && (authorId.dirty || authorId.touched)">
+            <div
+              *ngIf="authorId.errors?.['required']"
+              class="invalid-feedback show-error-validation"
+            >
+              please select the author*
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label cLabel for="exampleFormControlInput1">Published date :</label>
+          <input
+            cFormControl
+            id="publishedAt"
+            name="publishedAt"
+            [(ngModel)]="book.publishedAt"
+            [ngModel]="book.publishedAt | date: 'yyyy-MM-dd'"
+            #publishedAt="ngModel"
+            [required]="true"
+            type="date"
+            [valid]="
+              publishedAt.dirty || publishedAt.touched
+                ? !publishedAt.invalid
+                : undefined
+            "
+          />
+          <div
+            *ngIf="
+              publishedAt.invalid && (publishedAt.dirty || publishedAt.touched)
+            "
+          >
+            <div
+              *ngIf="publishedAt.errors?.['required']"
+              class="invalid-feedback show-error-validation"
+            >
+              Published date is required
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label cLabel for="exampleFormControlInput1">Pages count</label>
+          <input
+            cFormControl
+            id="numberOfPages"
+            name="numberOfPages"
+            [(ngModel)]="book.numberOfPages"
+            #numberOfPages="ngModel"
+            [required]="true"
+            type="number"
+            min="40"
+            max="1200"
+            [valid]="
+              numberOfPages.dirty || numberOfPages.touched
+                ? !numberOfPages.invalid
+                : undefined
+            "
+          />
+          <div
+            *ngIf="
+              numberOfPages.invalid &&
+              (numberOfPages.dirty || numberOfPages.touched)
+            "
+          >
+            <div
+              *ngIf="numberOfPages.errors?.['required']"
+              class="invalid-feedback show-error-validation"
+            >
+              total pages number of the book is required.
+            </div>
+            <div
+              *ngIf="numberOfPages.errors?.['max']"
+              class="invalid-feedback show-error-validation"
+            >
+              the total pages cannot exceed 1200 pages.
+            </div>
+            <div
+              *ngIf="numberOfPages.errors?.['min']"
+              class="invalid-feedback show-error-validation"
+            >
+              the total pages cannot be less than 40 pages.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label cLabel for="exampleFormControlInput1">Genres</label>
+          <select cSelect id="genres" (change)="onSelectGenre($event)">
+            <option value="">Choose Genres</option>
+            <option
+              *ngFor="let genre of genres"
+              [value]="genre.id"
+              (onSelectionChange)="onSelectGenre($event)"
+            >
+              {{ genre.name }}
+            </option>
+          </select>
+          <div
+            *ngIf="selectedGenres.length <= 0"
+            class="invalid-feedback show-error-validation"
+          >
+            please at least select one genre.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-group mt-6" style="margin-top: 30px">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+              *ngFor="let selectGenre of selectedGenres"
+            >
+              {{ selectGenre.name }}
+              <c-badge
+                color="danger"
+                shape="rounded-pill"
+                style="cursor: pointer"
+                (click)="deleteFromSelectedGenres(selectGenre.id)"
+                >X</c-badge
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="col-12">
+          <label cLabel for="exampleFormControlInput1">Book summary</label>
+          <textarea
+            cFormControl
+            id="summary"
+            name="summary"
+            [(ngModel)]="book.summary"
+            #summary="ngModel"
+          >
+          </textarea>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-6 offset-md-5 mt-10">
+
+          <button type="submit" [disabled]="!bookForm.valid" class="btn btn-lg btn-outline-primary">
+            <span *ngIf="isSaving">
+              <fa-icon [icon]="faCircleNotch" [spin]="true"></fa-icon>
+            </span>
+            <span *ngIf="!isSaving">
+              <fa-icon [icon]="faSave" ></fa-icon> Save
+            </span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
